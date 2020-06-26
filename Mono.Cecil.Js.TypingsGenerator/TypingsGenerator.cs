@@ -30,34 +30,79 @@ namespace Mono.Cecil.Js.TypingsGenerator
                 types = rtle.Types;
             }
 
-            foreach (var type in types.Where(t => t.IsPublic))
+            var publicTypes = types.Where(t => t.IsPublic);
+
+            foreach (var type in publicTypes)
                 AddType(type);
         }
 
         public void AddType(Type type)
         {
-            while (type?.FullName != null && !this.types.Any(t => t.FullName == type.FullName))
+            var typeName = type.Name;
+            if (type.IsGenericType && type.Name.LastIndexOf('`') > -1)
+            {
+                typeName = type.Name.Substring(0, type.Name.LastIndexOf('`'));
+            }
+
+            if (type.FullName != null && type.FullName != "System.Object"
+                && !this.types.Any(t => t.FullName == type.FullName)
+                && !(type.IsGenericType && type.GetGenericArguments().Count(a => a.FullName != null) > 0) // exclude overloaded types
+                && !type.IsByRef
+                && !type.IsArray
+                && !type.IsPointer
+                && !type.IsNested
+            )
             {
                 this.types.Add(type);
-                if (type.BaseType != null && type.BaseType.FullName != "System.Object")
+
+                foreach (var method in type.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
                 {
-                    type = type.BaseType;
+                    if (method.ReturnType != type)
+                    {
+                        AddType(method.ReturnType);
+                    }
+
+                    foreach (var prm in method.GetParameters())
+                    {
+                        if (prm.ParameterType != type)
+                        {
+                            AddType(prm.ParameterType);
+                        }
+                    }
                 }
-                else break;
+
+                if (type.BaseType != null)
+                {
+                    AddType(type.BaseType);
+                }
             }
         }
         public void AddType<TType>() => AddType(typeof(TType));
 
         private string GetJsType(Type type)
         {
+            string resolve()
+            {
+                if (this.types.Contains(type)
+                    && !type.IsGenericType
+                )
+                {
+                    return type.FullName;
+                }
+
+                return null;
+            };
+
             return type.FullName switch
             {
                 "System.Void" => "void",
 
                 "System.Boolean" => "boolean",
                 "System.Boolean[]" => "boolean[]",
+
                 "System.String" => "string",
                 "System.String[]" => "string[]",
+
                 "System.Int16" => "number",
                 "System.Int16[]" => "number[]",
                 "System.Int32" => "number",
@@ -68,11 +113,45 @@ namespace Mono.Cecil.Js.TypingsGenerator
                 "System.Single[]" => "number[]",
                 "System.Decimal" => "number",
                 "System.Decimal[]" => "number[]",
-                _ => "any"
+                "System.Char" => "number",
+                "System.Char[]" => "number[]",
+
+                _ => resolve() ?? "any"
             };
         }
 
-        private void WriteType(Type type, StringBuilder sb)
+        private void WriteMethodParameters(Type type, MethodBase method, StringBuilder sb)
+        {
+            foreach (var arg in method.GetParameters())
+            {
+                if (arg.Position != 0)
+                    sb.Append(", ");
+
+                if (arg.GetCustomAttributes(typeof(ParamArrayAttribute), false).Length > 0)
+                    sb.Append("...");
+
+                if (arg.Name == "function") sb.Append("_");
+                sb.Append(arg.Name);
+
+                if (arg.HasDefaultValue)
+                    sb.Append("?");
+
+                sb.Append(": ");
+
+                if (type.IsGenericType)
+                {
+                    if (type.GetGenericArguments().Any(t => t == arg.ParameterType))
+                    {
+                        sb.Append(arg.ParameterType.Name);
+
+                        continue;
+                    }
+                }
+                sb.Append(GetJsType(arg.ParameterType));
+            }
+        }
+
+        private bool WriteType(Type type, StringBuilder sb)
         {
             var typeIsStatic = type.IsAbstract && type.IsSealed;
 
@@ -85,6 +164,10 @@ namespace Mono.Cecil.Js.TypingsGenerator
                 sb.Append("<");
                 foreach (var ga in args)
                 {
+                    if (ga.IsGenericType)
+                    {
+                        return false; // dont get support this
+                    }
                     sb.Append(ga.Name);
                 }
                 sb.Append(">");
@@ -130,7 +213,6 @@ namespace Mono.Cecil.Js.TypingsGenerator
                 }
             }
 
-            //foreach (var property in type.GetProperties())
             foreach (var property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance))
             {
                 sb.Append("\t\t\t");
@@ -171,7 +253,6 @@ namespace Mono.Cecil.Js.TypingsGenerator
                     sb.AppendLine(";");
                 }
 
-
                 foreach (var method in type.GetMethods())
                 {
                     if (type.GetProperties().Any(p => p.GetMethod == method || p.SetMethod == method)) continue;
@@ -183,32 +264,7 @@ namespace Mono.Cecil.Js.TypingsGenerator
                     sb.Append(method.Name);
                     sb.Append("(");
 
-                    foreach (var arg in method.GetParameters())
-                    {
-                        if (arg.Position != 0)
-                            sb.Append(", ");
-
-                        if (arg.GetCustomAttributes(typeof(ParamArrayAttribute), false).Length > 0)
-                            sb.Append("...");
-
-                        sb.Append(arg.Name);
-
-                        if (arg.HasDefaultValue)
-                            sb.Append("?");
-
-                        sb.Append(": ");
-
-                        if (type.IsGenericType)
-                        {
-                            if (type.GetGenericArguments().Any(t => t == arg.ParameterType))
-                            {
-                                sb.Append(arg.ParameterType);
-
-                                continue;
-                            }
-                        }
-                        sb.Append(GetJsType(arg.ParameterType));
-                    }
+                    WriteMethodParameters(type, method, sb);
 
                     sb.Append(") ");
 
@@ -216,10 +272,31 @@ namespace Mono.Cecil.Js.TypingsGenerator
 
                     sb.AppendLine(";");
                 }
+
+                foreach (var evt in type.GetEvents())
+                {
+                    sb.Append("\t\t\t");
+                    if (typeIsStatic || evt.AddMethod.IsStatic) sb.Append("static ");
+
+                    sb.Append(evt.Name);
+
+                    var invoke = evt.EventHandlerType.GetMethod("Invoke");
+
+                    sb.Append(": ");
+                    sb.Append("{ connect: (callback: (");
+                    WriteMethodParameters(type, invoke, sb);
+                    sb.Append(") => ");
+                    sb.Append(GetJsType(evt.EventHandlerType.GetMethod("Invoke").ReturnType));
+                    sb.Append(") => {disconnect: () => void} }");
+
+                    sb.AppendLine(";");
+                }
             }
+
+            return true;
         }
 
-        public void Write(string outputFile = "../../../scripts/otapi/src/typings/global_autogenerated.d.ts")
+        public void Write(string outputFile = "global.autogenerated.d.ts")
         {
             var sb = new StringBuilder();
 
@@ -237,29 +314,30 @@ namespace Mono.Cecil.Js.TypingsGenerator
                 {
                     if (type.IsNested) continue;
 
+                    StringBuilder sub = new StringBuilder();
+
                     if (type.IsInterface)
                     {
-                        sb.Append($"\t\tinterface ");
-                        WriteType(type, sb);
+                        sub.Append($"\t\tinterface ");
                     }
                     else if (type.IsEnum)
                     {
-                        if (type.CustomAttributes.Any(x => x.AttributeType.FullName == "System.FlagsAttribute"))
-                        {
-                            sb.AppendLine($"\t\t/** Flags */");
-                        }
+                        if (type.GetCustomAttributes(typeof(FlagsAttribute), false).Length > 0)
+                            sub.AppendLine($"\t\t/** Flags */");
 
-                        sb.Append($"\t\tenum ");
-                        WriteType(type, sb);
+                        sub.Append($"\t\tenum ");
                     }
                     else
                     {
-                        sb.Append($"\t\t");
+                        sub.Append($"\t\t");
                         if (type.IsAbstract)
-                            sb.Append("abstract ");
-                        sb.Append("class ");
-                        WriteType(type, sb);
+                            sub.Append("abstract ");
+                        sub.Append("class ");
                     }
+
+                    if (!WriteType(type, sub)) continue;
+
+                    sb.Append(sub);
 
                     sb.AppendLine("\t\t}");
                 }
@@ -279,6 +357,8 @@ namespace Mono.Cecil.Js.TypingsGenerator
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
+                    this.types.Clear();
+                    this.types = null;
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

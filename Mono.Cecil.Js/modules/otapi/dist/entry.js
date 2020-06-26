@@ -1,28 +1,21 @@
-const {
-    System,
-    Mono,
-    MonoMod,
-} = dotnet;
-
-export function using<T extends { Dispose() }>(instance: T, callback: (instance: T) => void) {
+const { System, Mono, MonoMod, } = dotnet;
+export function using(instance, callback) {
     callback(instance);
     instance.Dispose();
 }
-
 export default function () {
     console.log('Running JavaScript modifications...');
-
     // const assembly = Mono.Cecil.AssemblyDefinition.ReadAssembly("Mono.Cecil.Js.dll");
     // if(assembly) {
     //     console.log('test');
     // }
-
-    System.Console.Write('Are you awesome? [Y/n]: ')
-    if(System.Console.ReadLine().toLowerCase() != 'y') {
-        console.log('You arent awesome, how disappointing');
-        return;
-    }
-
+    // System.Console.Write('Are you awesome? [Y/n]: ');
+    // if(String.fromCharCode(System.Console.ReadKey().KeyChar).toLowerCase() != 'y') {
+    //     console.log();
+    //     console.log('You arent awesome, how disappointing');
+    //     return;
+    // }
+    // console.log();
     const zipPath = "terraria-server-1405.zip";
     if (!System.IO.File.Exists(zipPath)) {
         console.log('Downloading server...');
@@ -31,34 +24,37 @@ export default function () {
             System.IO.File.WriteAllBytes(zipPath, data);
         });
         console.log('Done');
-    } else console.log(`${zipPath} already exists`);
-
+    }
+    else
+        console.log(`${zipPath} already exists`);
     var directory = System.IO.Path.GetFileNameWithoutExtension(zipPath);
     var info = new System.IO.DirectoryInfo(directory);
     console.log(`Extracting to ${directory}`);
-
-    if (info.Exists) info.Delete(true);
-
+    if (info.Exists)
+        info.Delete(true);
     info.Refresh();
-
     if (!info.Exists || info.GetDirectories().Length == 0)
         System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, directory);
-
     const pathIn = System.IO.Path.Combine(directory, "1405", "Windows", "TerrariaServer.exe");
-
     console.log(`Extracting embedded binaries for assembly resolution...`);
     var extractor = new Mono.Cecil.Js.ResourceExtractor();
     var embeddedResourcesDir = extractor.Extract(pathIn);
-
     using(new Mono.Cecil.Js.JsModder(), mm => {
         mm.InputPath = pathIn;
         mm.OutputPath = "OTAPI.dll";
         mm.MissingDependencyThrow = false;
-        mm.GACPaths = host.newArr(System.String, 0);
+        // mm.GACPaths = host.newArr(System.String, 0);
         mm.DefaultAssemblyResolver.AddSearchDirectory(embeddedResourcesDir);
-
+        var connection = mm.DefaultAssemblyResolver.ResolveFailure.connect((sender, args) => {
+            if (args.Name == "System.Security.Permissions") {
+                console.log(`ResolveFailure: ${args.FullName}`);
+                // TODO NuGet resolver
+            }
+            return null;
+        });
+        //connection.disconnect();
+        // mm.DefaultAssemblyResolver.
         mm.Read();
-
         mm.MapDependencies();
         mm.AutoPatch();
         mm.Write();
