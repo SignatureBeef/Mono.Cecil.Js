@@ -232,7 +232,7 @@ namespace Mono.Cecil.Js.TypingsGenerator
                 {
                     if (type.GetProperties().Any(p => p.GetMethod == method || p.SetMethod == method)) continue;
 
-                    sb.Append("\t\t\t ");
+                    sb.Append("\t\t\t");
                     if (typeIsStatic || method.IsStatic) sb.Append("static ");
 
                     sb.Append("constructor");
@@ -248,9 +248,7 @@ namespace Mono.Cecil.Js.TypingsGenerator
                         sb.Append(GetJsType(arg.ParameterType));
                     }
 
-                    sb.Append(") ");
-
-                    sb.AppendLine(";");
+                    sb.AppendLine(");");
                 }
 
                 foreach (var method in type.GetMethods())
@@ -258,7 +256,7 @@ namespace Mono.Cecil.Js.TypingsGenerator
                     if (type.GetProperties().Any(p => p.GetMethod == method || p.SetMethod == method)) continue;
                     if (type.GetProperties().Any(p => $"get_{p.Name}" == method.Name || $"set_{p.Name}" == method.Name)) continue; // TODO: use the correct implementation
 
-                    sb.Append("\t\t\t ");
+                    sb.Append("\t\t\t");
                     if (typeIsStatic || method.IsStatic) sb.Append("static ");
 
                     sb.Append(method.Name);
@@ -266,9 +264,7 @@ namespace Mono.Cecil.Js.TypingsGenerator
 
                     WriteMethodParameters(type, method, sb);
 
-                    sb.Append(") ");
-
-                    sb.Append(": " + GetJsType(method.ReturnType));
+                    sb.Append("): " + GetJsType(method.ReturnType));
 
                     sb.AppendLine(";");
                 }
