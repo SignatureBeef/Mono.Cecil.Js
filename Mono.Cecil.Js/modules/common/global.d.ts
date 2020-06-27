@@ -3,3 +3,5 @@ declare class Host {
 }
 
 declare const host: Host;
+
+declare function importNamespace(namespace: string) : any;

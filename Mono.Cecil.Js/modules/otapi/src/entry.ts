@@ -1,8 +1,8 @@
-const {
-    System,
-    Mono,
-    MonoMod,
-} = dotnet;
+// const {
+//     System,
+//     Mono,
+//     MonoMod,
+// } = dotnet;
 
 export function using<T extends { Dispose() }>(instance: T, callback: (instance: T) => void) {
     callback(instance);
@@ -11,6 +11,7 @@ export function using<T extends { Dispose() }>(instance: T, callback: (instance:
 
 export default function () {
     console.log('Running JavaScript modifications...');
+
 
     // const assembly = Mono.Cecil.AssemblyDefinition.ReadAssembly("Mono.Cecil.Js.dll");
     // if(assembly) {
@@ -49,31 +50,36 @@ export default function () {
     const pathIn = System.IO.Path.Combine(directory, "1405", "Windows", "TerrariaServer.exe");
 
     console.log(`Extracting embedded binaries for assembly resolution...`);
-    var extractor = new Mono.Cecil.Js.ResourceExtractor();
+    var extractor = new Mono.Cecil.Js.Cecil.ResourceExtractor();
     var embeddedResourcesDir = extractor.Extract(pathIn);
 
-    using(new Mono.Cecil.Js.JsModder(), mm => {
+    using(new MonoMod.MonoModder(), mm => {
         mm.InputPath = pathIn;
         mm.OutputPath = "OTAPI.dll";
         mm.MissingDependencyThrow = false;
         // mm.GACPaths = host.newArr(System.String, 0);
-        mm.DefaultAssemblyResolver.AddSearchDirectory(embeddedResourcesDir);
+        console.log('Adding search path: ' + embeddedResourcesDir);
+        (mm.AssemblyResolver as Mono.Cecil.DefaultAssemblyResolver).AddSearchDirectory(embeddedResourcesDir);
 
-        var connection = mm.DefaultAssemblyResolver.ResolveFailure.connect((sender, args) => {
-            if (args.Name == "System.Security.Permissions") {
-                console.log(`ResolveFailure: ${args.FullName}`);
-                // TODO NuGet resolver
-            }
-            return null;
-        });
+        // var connection = mm.DefaultAssemblyResolver.ResolveFailure.connect((sender, args) => {
+        //     if (args.Name == "System.Security.Permissions") {
+        //         console.log(`ResolveFailure: ${args.FullName}`);
+        //         // TODO NuGet resolver
+        //     }
+        //     return null;
+        // });
         //connection.disconnect();
 
-        // mm.DefaultAssemblyResolver.
-
+        console.log('Reading');
         mm.Read();
 
+        console.log('MapDependencies');
         mm.MapDependencies();
+        
+        console.log('AutoPatch');
         mm.AutoPatch();
+        
+        console.log('Write');
         mm.Write();
     });
 }
