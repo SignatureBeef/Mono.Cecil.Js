@@ -71,6 +71,26 @@ namespace Mono.Cecil.Js.TypingsGenerator
                     }
                 }
 
+                foreach (var evt in type.GetEvents(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+                {
+                    if (evt.EventHandlerType != type)
+                    {
+                        AddType(evt.EventHandlerType);
+
+                        var invoke = evt.EventHandlerType.GetMethod("Invoke");
+                        if(invoke != null)
+                        {
+                            foreach(var prm in invoke.GetParameters())
+                            {
+                                if (prm.ParameterType != type)
+                                {
+                                    AddType(prm.ParameterType);
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if (type.BaseType != null)
                 {
                     AddType(type.BaseType);
@@ -256,37 +276,52 @@ namespace Mono.Cecil.Js.TypingsGenerator
                     if (type.GetProperties().Any(p => p.GetMethod == method || p.SetMethod == method)) continue;
                     if (type.GetProperties().Any(p => $"get_{p.Name}" == method.Name || $"set_{p.Name}" == method.Name)) continue; // TODO: use the correct implementation
 
+                    var methodEvent = type.GetEvents().SingleOrDefault(e => e.AddMethod == method);
+
                     sb.Append("\t\t");
                     if (typeIsStatic || method.IsStatic) sb.Append("static ");
 
                     sb.Append(method.Name);
                     sb.Append("(");
 
-                    WriteMethodParameters(type, method, sb);
+                    if (methodEvent != null)
+                    {
+                        sb.Append("handler: (");
+                        var invoke = methodEvent.EventHandlerType.GetMethod("Invoke");
+                        WriteMethodParameters(methodEvent.EventHandlerType, invoke, sb);
 
-                    sb.Append("): " + GetJsType(method.ReturnType));
+                        sb.Append(") => " + GetJsType(invoke.ReturnType));
 
-                    sb.AppendLine(";");
+                        sb.AppendLine("): void;");
+                    }
+                    else
+                    {
+                        WriteMethodParameters(type, method, sb);
+
+                        sb.Append("): " + GetJsType(method.ReturnType));
+
+                        sb.AppendLine(";");
+                    }
                 }
 
-                foreach (var evt in type.GetEvents())
-                {
-                    sb.Append("\t\t");
-                    if (typeIsStatic || evt.AddMethod.IsStatic) sb.Append("static ");
+                //foreach (var evt in type.GetEvents())
+                //{
+                //    sb.Append("\t\t");
+                //    if (typeIsStatic || evt.AddMethod.IsStatic) sb.Append("static ");
 
-                    sb.Append(evt.Name);
+                //    sb.Append(evt.Name);
 
-                    var invoke = evt.EventHandlerType.GetMethod("Invoke");
+                //    var invoke = evt.EventHandlerType.GetMethod("Invoke");
 
-                    sb.Append(": ");
-                    sb.Append("{ connect: (callback: (");
-                    WriteMethodParameters(type, invoke, sb);
-                    sb.Append(") => ");
-                    sb.Append(GetJsType(evt.EventHandlerType.GetMethod("Invoke").ReturnType));
-                    sb.Append(") => {disconnect: () => void} }");
+                //    sb.Append(": ");
+                //    sb.Append("{ connect: (callback: (");
+                //    WriteMethodParameters(type, invoke, sb);
+                //    sb.Append(") => ");
+                //    sb.Append(GetJsType(evt.EventHandlerType.GetMethod("Invoke").ReturnType));
+                //    sb.Append(") => {disconnect: () => void} }");
 
-                    sb.AppendLine(";");
-                }
+                //    sb.AppendLine(";");
+                //}
             }
 
             return true;

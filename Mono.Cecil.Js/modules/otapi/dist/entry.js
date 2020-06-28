@@ -51,25 +51,20 @@ function default_1() {
         mm.InputPath = pathIn;
         mm.OutputPath = "OTAPI.dll";
         mm.MissingDependencyThrow = false;
-        // mm.GACPaths = host.newArr(System.String, 0);
+        // mm.GACPaths = [];
         console.log('Adding search path: ' + embeddedResourcesDir);
         mm.AssemblyResolver.AddSearchDirectory(embeddedResourcesDir);
-        // var connection = mm.DefaultAssemblyResolver.ResolveFailure.connect((sender, args) => {
-        //     if (args.Name == "System.Security.Permissions") {
-        //         console.log(`ResolveFailure: ${args.FullName}`);
-        //         // TODO NuGet resolver
-        //     }
-        //     return null;
-        // });
-        //connection.disconnect();
-        console.log('Reading');
+        mm.AssemblyResolver.add_ResolveFailure(function (sender, reference) {
+            if (reference.Name == "System.Security.Permissions") {
+                console.log("ResolveFailure: " + reference.FullName);
+                // TODO NuGet resolver
+            }
+            return null;
+        });
         mm.Read();
-        console.log('MapDependencies');
         mm.MapDependencies();
-        console.log('AutoPatch');
         mm.AutoPatch();
-        console.log('Write');
-        mm.Write();
+        mm.Write(null, null);
     });
 }
 exports.default = default_1;
