@@ -57,11 +57,13 @@ export default function () {
         mm.InputPath = pathIn;
         mm.OutputPath = "OTAPI.dll";
         mm.MissingDependencyThrow = false;
-        // mm.GACPaths = [];
+        mm.GACPaths = [];
         console.log('Adding search path: ' + embeddedResourcesDir);
-        (mm.AssemblyResolver as Mono.Cecil.DefaultAssemblyResolver).AddSearchDirectory(embeddedResourcesDir);
+        const resolver = mm.AssemblyResolver as Mono.Cecil.DefaultAssemblyResolver;
 
-        (mm.AssemblyResolver as Mono.Cecil.DefaultAssemblyResolver).add_ResolveFailure(function (sender, reference) {
+        resolver.AddSearchDirectory(embeddedResourcesDir);
+
+        resolver.add_ResolveFailure((sender, reference) => {
             if (reference.Name == "System.Security.Permissions") {
                 console.log(`ResolveFailure: ${reference.FullName}`);
                 // TODO NuGet resolver

@@ -648,9 +648,6 @@ declare module System {
 		constructor(year: number, month: number, day: number, hour: number, minute: number, second: number, millisecond: number, kind: System.DateTimeKind);
 		constructor(year: number, month: number, day: number, hour: number, minute: number, second: number, millisecond: number, calendar: System.Globalization.Calendar);
 		constructor(year: number, month: number, day: number, hour: number, minute: number, second: number, millisecond: number, calendar: System.Globalization.Calendar, kind: System.DateTimeKind);
-		static ParseExact(s: any, format: any, provider: System.IFormatProvider, style?: System.Globalization.DateTimeStyles): System.DateTime;
-		static ParseExact(s: string, formats: string[], provider: System.IFormatProvider, style: System.Globalization.DateTimeStyles): System.DateTime;
-		static ParseExact(s: any, formats: string[], provider: System.IFormatProvider, style?: System.Globalization.DateTimeStyles): System.DateTime;
 		Subtract(value: System.DateTime): System.TimeSpan;
 		Subtract(value: System.TimeSpan): System.DateTime;
 		ToOADate(): System.Double;
@@ -720,6 +717,9 @@ declare module System {
 		static Parse(s: any, provider?: System.IFormatProvider, styles?: System.Globalization.DateTimeStyles): System.DateTime;
 		static ParseExact(s: string, format: string, provider: System.IFormatProvider): System.DateTime;
 		static ParseExact(s: string, format: string, provider: System.IFormatProvider, style: System.Globalization.DateTimeStyles): System.DateTime;
+		static ParseExact(s: any, format: any, provider: System.IFormatProvider, style?: System.Globalization.DateTimeStyles): System.DateTime;
+		static ParseExact(s: string, formats: string[], provider: System.IFormatProvider, style: System.Globalization.DateTimeStyles): System.DateTime;
+		static ParseExact(s: any, formats: string[], provider: System.IFormatProvider, style?: System.Globalization.DateTimeStyles): System.DateTime;
 		GetType(): System.Type;
 	}
 	enum DateTimeKind {
@@ -1695,11 +1695,6 @@ declare module System {
 		IsSerializable: boolean;
 		ContainsGenericParameters: boolean;
 		IsVisible: boolean;
-		GetEvent(name: string): System.Reflection.EventInfo;
-		GetEvent(name: string, bindingAttr: System.Reflection.BindingFlags): System.Reflection.EventInfo;
-		GetEvents(): any;
-		GetEvents(bindingAttr: System.Reflection.BindingFlags): any;
-		GetField(name: string): System.Reflection.FieldInfo;
 		GetField(name: string, bindingAttr: System.Reflection.BindingFlags): System.Reflection.FieldInfo;
 		GetFields(): any;
 		GetFields(bindingAttr: System.Reflection.BindingFlags): any;
@@ -1795,6 +1790,11 @@ declare module System {
 		GetConstructor(bindingAttr: System.Reflection.BindingFlags, binder: System.Reflection.Binder, callConvention: System.Reflection.CallingConventions, types: any, modifiers: any): System.Reflection.ConstructorInfo;
 		GetConstructors(): any;
 		GetConstructors(bindingAttr: System.Reflection.BindingFlags): any;
+		GetEvent(name: string): System.Reflection.EventInfo;
+		GetEvent(name: string, bindingAttr: System.Reflection.BindingFlags): System.Reflection.EventInfo;
+		GetEvents(): any;
+		GetEvents(bindingAttr: System.Reflection.BindingFlags): any;
+		GetField(name: string): System.Reflection.FieldInfo;
 		HasSameMetadataDefinitionAs(other: System.Reflection.MemberInfo): boolean;
 		IsDefined(attributeType: System.Type, inherit: boolean): boolean;
 		GetCustomAttributes(inherit: boolean): any;
@@ -2544,8 +2544,8 @@ declare module System.Reflection {
 		VersionCompatibility: System.Configuration.Assemblies.AssemblyVersionCompatibility;
 		KeyPair: System.Reflection.StrongNameKeyPair;
 		FullName: string;
-		constructor();
 		constructor(assemblyName: string);
+		constructor();
 		Clone(): any;
 		static GetAssemblyName(assemblyFile: string): System.Reflection.AssemblyName;
 		GetPublicKey(): any;
@@ -3002,8 +3002,8 @@ declare module System.Reflection {
 	class ModuleResolveEventHandler extends System.MulticastDelegate {
 		constructor(object: any, method: System.IntPtr);
 		Invoke(sender: any, e: System.ResolveEventArgs): System.Reflection.Module;
-		BeginInvoke(sender: any, e: System.ResolveEventArgs, callback: System.AsyncCallback, object: any): System.IAsyncResult;
 		EndInvoke(result: System.IAsyncResult): System.Reflection.Module;
+		BeginInvoke(sender: any, e: System.ResolveEventArgs, callback: System.AsyncCallback, object: any): System.IAsyncResult;
 		GetObjectData(info: System.Runtime.Serialization.SerializationInfo, context: System.Runtime.Serialization.StreamingContext): void;
 		Equals(obj: any): boolean;
 		GetInvocationList(): any;
@@ -3178,347 +3178,6 @@ declare module System.Reflection {
 		ToString(): string;
 	}
 }
-declare module System.Text {
-	abstract class Decoder {
-		Fallback: System.Text.DecoderFallback;
-		FallbackBuffer: System.Text.DecoderFallbackBuffer;
-		Reset(): void;
-		GetCharCount(bytes: any, index: number, count: number): number;
-		GetCharCount(bytes: any, index: number, count: number, flush: boolean): number;
-		GetCharCount(bytes: any, count: number, flush: boolean): number;
-		GetCharCount(bytes: any, flush: boolean): number;
-		GetChars(bytes: any, byteIndex: number, byteCount: number, chars: number[], charIndex: number): number;
-		GetChars(bytes: any, byteIndex: number, byteCount: number, chars: number[], charIndex: number, flush: boolean): number;
-		GetChars(bytes: any, byteCount: number, chars: any, charCount: number, flush: boolean): number;
-		GetChars(bytes: any, chars: any, flush: boolean): number;
-		Convert(bytes: any, byteIndex: number, byteCount: number, chars: number[], charIndex: number, charCount: number, flush: boolean, bytesUsed: any, charsUsed: any, completed: any): void;
-		Convert(bytes: any, byteCount: number, chars: any, charCount: number, flush: boolean, bytesUsed: any, charsUsed: any, completed: any): void;
-		Convert(bytes: any, chars: any, flush: boolean, bytesUsed: any, charsUsed: any, completed: any): void;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-	abstract class DecoderFallback {
-		MaxCharCount: number;
-		CreateFallbackBuffer(): System.Text.DecoderFallbackBuffer;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-	abstract class DecoderFallbackBuffer {
-		Remaining: number;
-		Fallback(bytesUnknown: any, index: number): boolean;
-		GetNextChar(): number;
-		MovePrevious(): boolean;
-		Reset(): void;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-	abstract class Encoder {
-		Fallback: System.Text.EncoderFallback;
-		FallbackBuffer: System.Text.EncoderFallbackBuffer;
-		Reset(): void;
-		GetByteCount(chars: number[], index: number, count: number, flush: boolean): number;
-		GetByteCount(chars: any, count: number, flush: boolean): number;
-		GetByteCount(chars: any, flush: boolean): number;
-		GetBytes(chars: number[], charIndex: number, charCount: number, bytes: any, byteIndex: number, flush: boolean): number;
-		GetBytes(chars: any, charCount: number, bytes: any, byteCount: number, flush: boolean): number;
-		GetBytes(chars: any, bytes: any, flush: boolean): number;
-		Convert(chars: number[], charIndex: number, charCount: number, bytes: any, byteIndex: number, byteCount: number, flush: boolean, charsUsed: any, bytesUsed: any, completed: any): void;
-		Convert(chars: any, charCount: number, bytes: any, byteCount: number, flush: boolean, charsUsed: any, bytesUsed: any, completed: any): void;
-		Convert(chars: any, bytes: any, flush: boolean, charsUsed: any, bytesUsed: any, completed: any): void;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-	abstract class EncoderFallback {
-		MaxCharCount: number;
-		CreateFallbackBuffer(): System.Text.EncoderFallbackBuffer;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-	abstract class EncoderFallbackBuffer {
-		Remaining: number;
-		Fallback(charUnknown: number, index: number): boolean;
-		Fallback(charUnknownHigh: number, charUnknownLow: number, index: number): boolean;
-		GetNextChar(): number;
-		MovePrevious(): boolean;
-		Reset(): void;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-	abstract class Encoding {
-		Preamble: any;
-		BodyName: string;
-		EncodingName: string;
-		HeaderName: string;
-		WebName: string;
-		WindowsCodePage: number;
-		IsBrowserDisplay: boolean;
-		IsBrowserSave: boolean;
-		IsMailNewsDisplay: boolean;
-		IsMailNewsSave: boolean;
-		IsSingleByte: boolean;
-		EncoderFallback: System.Text.EncoderFallback;
-		DecoderFallback: System.Text.DecoderFallback;
-		IsReadOnly: boolean;
-		CodePage: number;
-		static Convert(srcEncoding: System.Text.Encoding, dstEncoding: System.Text.Encoding, bytes: any): any;
-		static Convert(srcEncoding: System.Text.Encoding, dstEncoding: System.Text.Encoding, bytes: any, index: number, count: number): any;
-		static RegisterProvider(provider: System.Text.EncodingProvider): void;
-		static GetEncoding(codepage: number): System.Text.Encoding;
-		static GetEncoding(codepage: number, encoderFallback: System.Text.EncoderFallback, decoderFallback: System.Text.DecoderFallback): System.Text.Encoding;
-		static GetEncoding(name: string): System.Text.Encoding;
-		static GetEncoding(name: string, encoderFallback: System.Text.EncoderFallback, decoderFallback: System.Text.DecoderFallback): System.Text.Encoding;
-		static GetEncodings(): any;
-		GetPreamble(): any;
-		Clone(): any;
-		GetByteCount(chars: number[]): number;
-		GetByteCount(s: string): number;
-		GetByteCount(chars: number[], index: number, count: number): number;
-		GetByteCount(s: string, index: number, count: number): number;
-		GetByteCount(chars: any, count: number): number;
-		GetByteCount(chars: any): number;
-		GetBytes(chars: number[]): any;
-		GetBytes(chars: number[], index: number, count: number): any;
-		GetBytes(chars: number[], charIndex: number, charCount: number, bytes: any, byteIndex: number): number;
-		GetBytes(s: string): any;
-		GetBytes(s: string, index: number, count: number): any;
-		GetBytes(s: string, charIndex: number, charCount: number, bytes: any, byteIndex: number): number;
-		GetBytes(chars: any, charCount: number, bytes: any, byteCount: number): number;
-		GetBytes(chars: any, bytes: any): number;
-		GetCharCount(bytes: any): number;
-		GetCharCount(bytes: any, index: number, count: number): number;
-		GetCharCount(bytes: any, count: number): number;
-		GetCharCount(bytes: any): number;
-		GetChars(bytes: any): number[];
-		GetChars(bytes: any, index: number, count: number): number[];
-		GetChars(bytes: any, byteIndex: number, byteCount: number, chars: number[], charIndex: number): number;
-		GetChars(bytes: any, byteCount: number, chars: any, charCount: number): number;
-		GetChars(bytes: any, chars: any): number;
-		GetString(bytes: any, byteCount: number): string;
-		GetString(bytes: any): string;
-		IsAlwaysNormalized(): boolean;
-		IsAlwaysNormalized(form: System.Text.NormalizationForm): boolean;
-		GetDecoder(): System.Text.Decoder;
-		GetEncoder(): System.Text.Encoder;
-		GetMaxByteCount(charCount: number): number;
-		GetMaxCharCount(byteCount: number): number;
-		GetString(bytes: any): string;
-		GetString(bytes: any, index: number, count: number): string;
-		Equals(value: any): boolean;
-		GetHashCode(): number;
-		static CreateTranscodingStream(innerStream: System.IO.Stream, innerStreamEncoding: System.Text.Encoding, outerStreamEncoding: System.Text.Encoding, leaveOpen?: boolean): System.IO.Stream;
-		GetType(): System.Type;
-		ToString(): string;
-	}
-	abstract class EncodingProvider {
-		constructor();
-		GetEncoding(name: string): System.Text.Encoding;
-		GetEncoding(codepage: number): System.Text.Encoding;
-		GetEncoding(name: string, encoderFallback: System.Text.EncoderFallback, decoderFallback: System.Text.DecoderFallback): System.Text.Encoding;
-		GetEncoding(codepage: number, encoderFallback: System.Text.EncoderFallback, decoderFallback: System.Text.DecoderFallback): System.Text.Encoding;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-	enum NormalizationForm {
-		FormC = 1,
-		FormD = 2,
-		FormKC = 5,
-		FormKD = 6,
-	}
-	class Rune extends System.ValueType {
-		IsAscii: boolean;
-		IsBmp: boolean;
-		Plane: number;
-		Utf16SequenceLength: number;
-		Utf8SequenceLength: number;
-		Value: number;
-		constructor(ch: number);
-		constructor(highSurrogate: number, lowSurrogate: number);
-		constructor(value: number);
-		constructor(value: System.UInt32);
-		static op_Equality(left: System.Text.Rune, right: System.Text.Rune): boolean;
-		static op_Inequality(left: System.Text.Rune, right: System.Text.Rune): boolean;
-		static op_LessThan(left: System.Text.Rune, right: System.Text.Rune): boolean;
-		static op_LessThanOrEqual(left: System.Text.Rune, right: System.Text.Rune): boolean;
-		static op_GreaterThan(left: System.Text.Rune, right: System.Text.Rune): boolean;
-		static op_GreaterThanOrEqual(left: System.Text.Rune, right: System.Text.Rune): boolean;
-		static op_Explicit(ch: number): System.Text.Rune;
-		static op_Explicit(value: System.UInt32): System.Text.Rune;
-		static op_Explicit(value: number): System.Text.Rune;
-		CompareTo(other: System.Text.Rune): number;
-		static DecodeFromUtf16(source: any, result: any, charsConsumed: any): System.Buffers.OperationStatus;
-		static DecodeFromUtf8(source: any, result: any, bytesConsumed: any): System.Buffers.OperationStatus;
-		static DecodeLastFromUtf16(source: any, result: any, charsConsumed: any): System.Buffers.OperationStatus;
-		static DecodeLastFromUtf8(source: any, value: any, bytesConsumed: any): System.Buffers.OperationStatus;
-		EncodeToUtf16(destination: any): number;
-		EncodeToUtf8(destination: any): number;
-		Equals(obj: any): boolean;
-		Equals(other: System.Text.Rune): boolean;
-		GetHashCode(): number;
-		static GetRuneAt(input: string, index: number): System.Text.Rune;
-		static IsValid(value: number): boolean;
-		static IsValid(value: System.UInt32): boolean;
-		ToString(): string;
-		static TryCreate(ch: number, result: any): boolean;
-		static TryCreate(highSurrogate: number, lowSurrogate: number, result: any): boolean;
-		static TryCreate(value: number, result: any): boolean;
-		static TryCreate(value: System.UInt32, result: any): boolean;
-		TryEncodeToUtf16(destination: any, charsWritten: any): boolean;
-		TryEncodeToUtf8(destination: any, bytesWritten: any): boolean;
-		static TryGetRuneAt(input: string, index: number, value: any): boolean;
-		static GetNumericValue(value: System.Text.Rune): System.Double;
-		static GetUnicodeCategory(value: System.Text.Rune): System.Globalization.UnicodeCategory;
-		static IsControl(value: System.Text.Rune): boolean;
-		static IsDigit(value: System.Text.Rune): boolean;
-		static IsLetter(value: System.Text.Rune): boolean;
-		static IsLetterOrDigit(value: System.Text.Rune): boolean;
-		static IsLower(value: System.Text.Rune): boolean;
-		static IsNumber(value: System.Text.Rune): boolean;
-		static IsPunctuation(value: System.Text.Rune): boolean;
-		static IsSeparator(value: System.Text.Rune): boolean;
-		static IsSymbol(value: System.Text.Rune): boolean;
-		static IsUpper(value: System.Text.Rune): boolean;
-		static IsWhiteSpace(value: System.Text.Rune): boolean;
-		static ToLower(value: System.Text.Rune, culture: System.Globalization.CultureInfo): System.Text.Rune;
-		static ToLowerInvariant(value: System.Text.Rune): System.Text.Rune;
-		static ToUpper(value: System.Text.Rune, culture: System.Globalization.CultureInfo): System.Text.Rune;
-		static ToUpperInvariant(value: System.Text.Rune): System.Text.Rune;
-		GetType(): System.Type;
-	}
-	class StringBuilder {
-		Capacity: number;
-		MaxCapacity: number;
-		Length: number;
-		Chars: number;
-		constructor();
-		constructor(capacity: number);
-		constructor(value: string);
-		constructor(value: string, capacity: number);
-		constructor(value: string, startIndex: number, length: number, capacity: number);
-		constructor(capacity: number, maxCapacity: number);
-		Insert(index: number, value: System.UInt32): System.Text.StringBuilder;
-		Insert(index: number, value: System.UInt64): System.Text.StringBuilder;
-		Insert(index: number, value: any): System.Text.StringBuilder;
-		Insert(index: number, value: any): System.Text.StringBuilder;
-		AppendFormat(format: string, arg0: any): System.Text.StringBuilder;
-		AppendFormat(format: string, arg0: any, arg1: any): System.Text.StringBuilder;
-		AppendFormat(format: string, arg0: any, arg1: any, arg2: any): System.Text.StringBuilder;
-		AppendFormat(format: string, ...args: any): System.Text.StringBuilder;
-		AppendFormat(provider: System.IFormatProvider, format: string, arg0: any): System.Text.StringBuilder;
-		AppendFormat(provider: System.IFormatProvider, format: string, arg0: any, arg1: any): System.Text.StringBuilder;
-		AppendFormat(provider: System.IFormatProvider, format: string, arg0: any, arg1: any, arg2: any): System.Text.StringBuilder;
-		AppendFormat(provider: System.IFormatProvider, format: string, ...args: any): System.Text.StringBuilder;
-		Replace(oldValue: string, newValue: string): System.Text.StringBuilder;
-		Equals(sb: System.Text.StringBuilder): boolean;
-		Equals(span: any): boolean;
-		Replace(oldValue: string, newValue: string, startIndex: number, count: number): System.Text.StringBuilder;
-		Replace(oldChar: number, newChar: number): System.Text.StringBuilder;
-		Replace(oldChar: number, newChar: number, startIndex: number, count: number): System.Text.StringBuilder;
-		Append(value: any, valueCount: number): System.Text.StringBuilder;
-		EnsureCapacity(capacity: number): number;
-		ToString(): string;
-		ToString(startIndex: number, length: number): string;
-		Clear(): System.Text.StringBuilder;
-		GetChunks(): any;
-		Append(value: number, repeatCount: number): System.Text.StringBuilder;
-		Append(value: number[], startIndex: number, charCount: number): System.Text.StringBuilder;
-		Append(value: string): System.Text.StringBuilder;
-		Append(value: string, startIndex: number, count: number): System.Text.StringBuilder;
-		Append(value: System.Text.StringBuilder): System.Text.StringBuilder;
-		Append(value: System.Text.StringBuilder, startIndex: number, count: number): System.Text.StringBuilder;
-		AppendLine(): System.Text.StringBuilder;
-		AppendLine(value: string): System.Text.StringBuilder;
-		CopyTo(sourceIndex: number, destination: number[], destinationIndex: number, count: number): void;
-		CopyTo(sourceIndex: number, destination: any, count: number): void;
-		Insert(index: number, value: string, count: number): System.Text.StringBuilder;
-		Remove(startIndex: number, length: number): System.Text.StringBuilder;
-		Append(value: boolean): System.Text.StringBuilder;
-		Append(value: number): System.Text.StringBuilder;
-		Append(value: System.SByte): System.Text.StringBuilder;
-		Append(value: System.Byte): System.Text.StringBuilder;
-		Append(value: number): System.Text.StringBuilder;
-		Append(value: number): System.Text.StringBuilder;
-		Append(value: number): System.Text.StringBuilder;
-		Append(value: number): System.Text.StringBuilder;
-		Append(value: System.Double): System.Text.StringBuilder;
-		Append(value: number): System.Text.StringBuilder;
-		Append(value: System.UInt16): System.Text.StringBuilder;
-		Append(value: System.UInt32): System.Text.StringBuilder;
-		Append(value: System.UInt64): System.Text.StringBuilder;
-		Append(value: any): System.Text.StringBuilder;
-		Append(value: number[]): System.Text.StringBuilder;
-		Append(value: any): System.Text.StringBuilder;
-		Append(value: any): System.Text.StringBuilder;
-		AppendJoin(separator: string, ...values: any): System.Text.StringBuilder;
-		AppendJoin(separator: string, values: any): System.Text.StringBuilder;
-		AppendJoin(separator: string, ...values: string[]): System.Text.StringBuilder;
-		AppendJoin(separator: number, ...values: any): System.Text.StringBuilder;
-		AppendJoin(separator: number, values: any): System.Text.StringBuilder;
-		AppendJoin(separator: number, ...values: string[]): System.Text.StringBuilder;
-		Insert(index: number, value: string): System.Text.StringBuilder;
-		Insert(index: number, value: boolean): System.Text.StringBuilder;
-		Insert(index: number, value: System.SByte): System.Text.StringBuilder;
-		Insert(index: number, value: System.Byte): System.Text.StringBuilder;
-		Insert(index: number, value: number): System.Text.StringBuilder;
-		Insert(index: number, value: number): System.Text.StringBuilder;
-		Insert(index: number, value: number[]): System.Text.StringBuilder;
-		Insert(index: number, value: number[], startIndex: number, charCount: number): System.Text.StringBuilder;
-		Insert(index: number, value: number): System.Text.StringBuilder;
-		Insert(index: number, value: number): System.Text.StringBuilder;
-		Insert(index: number, value: number): System.Text.StringBuilder;
-		Insert(index: number, value: System.Double): System.Text.StringBuilder;
-		Insert(index: number, value: number): System.Text.StringBuilder;
-		Insert(index: number, value: System.UInt16): System.Text.StringBuilder;
-		GetType(): System.Type;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-	class StringRuneEnumerator extends System.ValueType {
-		Current: System.Text.Rune;
-		GetEnumerator(): System.Text.StringRuneEnumerator;
-		MoveNext(): boolean;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-		ToString(): string;
-		GetType(): System.Type;
-	}
-}
-declare module System.Buffers {
-	enum OperationStatus {
-		Done = 0,
-		DestinationTooSmall = 1,
-		NeedMoreData = 2,
-		InvalidData = 3,
-	}
-}
-declare module System.Configuration.Assemblies {
-	enum AssemblyHashAlgorithm {
-		None = 0,
-		MD5 = 32771,
-		SHA1 = 32772,
-		SHA256 = 32780,
-		SHA384 = 32781,
-		SHA512 = 32782,
-	}
-	enum AssemblyVersionCompatibility {
-		SameMachine = 1,
-		SameProcess = 2,
-		SameDomain = 3,
-	}
-}
 declare module System.Runtime.Serialization {
 	class DeserializationToken extends System.ValueType {
 		Dispose(): void;
@@ -3621,6 +3280,170 @@ declare module System.Runtime.Serialization {
 		Clone = 64,
 		CrossAppDomain = 128,
 		All = 255,
+	}
+}
+declare module System.Configuration.Assemblies {
+	enum AssemblyHashAlgorithm {
+		None = 0,
+		MD5 = 32771,
+		SHA1 = 32772,
+		SHA256 = 32780,
+		SHA384 = 32781,
+		SHA512 = 32782,
+	}
+	enum AssemblyVersionCompatibility {
+		SameMachine = 1,
+		SameProcess = 2,
+		SameDomain = 3,
+	}
+}
+declare module System.Threading {
+	class CancellationToken extends System.ValueType {
+		IsCancellationRequested: boolean;
+		CanBeCanceled: boolean;
+		WaitHandle: System.Threading.WaitHandle;
+		constructor(canceled: boolean);
+		Register(callback: System.Action): System.Threading.CancellationTokenRegistration;
+		Register(callback: System.Action, useSynchronizationContext: boolean): System.Threading.CancellationTokenRegistration;
+		Register(callback: any, state: any): System.Threading.CancellationTokenRegistration;
+		Register(callback: any, state: any, useSynchronizationContext: boolean): System.Threading.CancellationTokenRegistration;
+		UnsafeRegister(callback: any, state: any): System.Threading.CancellationTokenRegistration;
+		Equals(other: System.Threading.CancellationToken): boolean;
+		Equals(other: any): boolean;
+		GetHashCode(): number;
+		static op_Equality(left: System.Threading.CancellationToken, right: System.Threading.CancellationToken): boolean;
+		static op_Inequality(left: System.Threading.CancellationToken, right: System.Threading.CancellationToken): boolean;
+		ThrowIfCancellationRequested(): void;
+		ToString(): string;
+		GetType(): System.Type;
+	}
+	class CancellationTokenRegistration extends System.ValueType {
+		Token: System.Threading.CancellationToken;
+		Dispose(): void;
+		DisposeAsync(): System.Threading.Tasks.ValueTask;
+		Unregister(): boolean;
+		static op_Equality(left: System.Threading.CancellationTokenRegistration, right: System.Threading.CancellationTokenRegistration): boolean;
+		static op_Inequality(left: System.Threading.CancellationTokenRegistration, right: System.Threading.CancellationTokenRegistration): boolean;
+		Equals(obj: any): boolean;
+		Equals(other: System.Threading.CancellationTokenRegistration): boolean;
+		GetHashCode(): number;
+		ToString(): string;
+		GetType(): System.Type;
+	}
+	abstract class WaitHandle extends System.MarshalByRefObject {
+		Handle: System.IntPtr;
+		SafeWaitHandle: Microsoft.Win32.SafeHandles.SafeWaitHandle;
+		Close(): void;
+		Dispose(): void;
+		WaitOne(millisecondsTimeout: number): boolean;
+		WaitOne(timeout: System.TimeSpan): boolean;
+		WaitOne(): boolean;
+		WaitOne(millisecondsTimeout: number, exitContext: boolean): boolean;
+		WaitOne(timeout: System.TimeSpan, exitContext: boolean): boolean;
+		static WaitAll(waitHandles: any, millisecondsTimeout: number): boolean;
+		static WaitAll(waitHandles: any, timeout: System.TimeSpan): boolean;
+		static WaitAll(waitHandles: any): boolean;
+		static WaitAll(waitHandles: any, millisecondsTimeout: number, exitContext: boolean): boolean;
+		static WaitAll(waitHandles: any, timeout: System.TimeSpan, exitContext: boolean): boolean;
+		static WaitAny(waitHandles: any, millisecondsTimeout: number): number;
+		static WaitAny(waitHandles: any, timeout: System.TimeSpan): number;
+		static WaitAny(waitHandles: any): number;
+		static WaitAny(waitHandles: any, millisecondsTimeout: number, exitContext: boolean): number;
+		static WaitAny(waitHandles: any, timeout: System.TimeSpan, exitContext: boolean): number;
+		static SignalAndWait(toSignal: System.Threading.WaitHandle, toWaitOn: System.Threading.WaitHandle): boolean;
+		static SignalAndWait(toSignal: System.Threading.WaitHandle, toWaitOn: System.Threading.WaitHandle, timeout: System.TimeSpan, exitContext: boolean): boolean;
+		static SignalAndWait(toSignal: System.Threading.WaitHandle, toWaitOn: System.Threading.WaitHandle, millisecondsTimeout: number, exitContext: boolean): boolean;
+		GetLifetimeService(): any;
+		InitializeLifetimeService(): any;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+}
+declare module Microsoft.Win32.SafeHandles {
+	class SafeFileHandle extends Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid {
+		IsInvalid: boolean;
+		constructor(preexistingHandle: System.IntPtr, ownsHandle: boolean);
+		DangerousGetHandle(): System.IntPtr;
+		Close(): void;
+		Dispose(): void;
+		SetHandleAsInvalid(): void;
+		DangerousAddRef(success: any): void;
+		DangerousRelease(): void;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+	abstract class SafeHandleZeroOrMinusOneIsInvalid extends System.Runtime.InteropServices.SafeHandle {
+		IsInvalid: boolean;
+		DangerousGetHandle(): System.IntPtr;
+		Close(): void;
+		Dispose(): void;
+		SetHandleAsInvalid(): void;
+		DangerousAddRef(success: any): void;
+		DangerousRelease(): void;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+	class SafeWaitHandle extends Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid {
+		constructor(existingHandle: System.IntPtr, ownsHandle: boolean);
+		DangerousGetHandle(): System.IntPtr;
+		Close(): void;
+		Dispose(): void;
+		SetHandleAsInvalid(): void;
+		DangerousAddRef(success: any): void;
+		DangerousRelease(): void;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+}
+declare module System.Runtime.InteropServices {
+	enum LayoutKind {
+		Sequential = 0,
+		Explicit = 2,
+		Auto = 3,
+	}
+	abstract class SafeHandle extends System.Runtime.ConstrainedExecution.CriticalFinalizerObject {
+		IsClosed: boolean;
+		IsInvalid: boolean;
+		DangerousGetHandle(): System.IntPtr;
+		Close(): void;
+		Dispose(): void;
+		SetHandleAsInvalid(): void;
+		DangerousAddRef(success: any): void;
+		DangerousRelease(): void;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+	class StructLayoutAttribute extends System.Attribute {
+			Pack: number;
+			Size: number;
+			CharSet: any;
+		Value: System.Runtime.InteropServices.LayoutKind;
+		constructor(layoutKind: System.Runtime.InteropServices.LayoutKind);
+		constructor(layoutKind: number);
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+		Match(obj: any): boolean;
+		IsDefaultAttribute(): boolean;
+		GetType(): System.Type;
+		ToString(): string;
+	}
+}
+declare module System.Runtime.ConstrainedExecution {
+	abstract class CriticalFinalizerObject {
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
 	}
 }
 declare module System.IO {
@@ -3918,8 +3741,8 @@ declare module System.IO {
 		EndRead(asyncResult: System.IAsyncResult): number;
 		EndWrite(asyncResult: System.IAsyncResult): void;
 		DisposeAsync(): System.Threading.Tasks.ValueTask;
-		Seek(offset: number, origin: System.IO.SeekOrigin): number;
 		CopyToAsync(destination: System.IO.Stream, bufferSize: number, cancellationToken: System.Threading.CancellationToken): System.Threading.Tasks.Task;
+		Seek(offset: number, origin: System.IO.SeekOrigin): number;
 		CopyToAsync(destination: System.IO.Stream): System.Threading.Tasks.Task;
 		CopyToAsync(destination: System.IO.Stream, bufferSize: number): System.Threading.Tasks.Task;
 		CopyToAsync(destination: System.IO.Stream, cancellationToken: System.Threading.CancellationToken): System.Threading.Tasks.Task;
@@ -4555,154 +4378,6 @@ declare module System.Threading.Tasks {
 		GetType(): System.Type;
 	}
 }
-declare module System.Threading {
-	class CancellationToken extends System.ValueType {
-		IsCancellationRequested: boolean;
-		CanBeCanceled: boolean;
-		WaitHandle: System.Threading.WaitHandle;
-		constructor(canceled: boolean);
-		Register(callback: System.Action): System.Threading.CancellationTokenRegistration;
-		Register(callback: System.Action, useSynchronizationContext: boolean): System.Threading.CancellationTokenRegistration;
-		Register(callback: any, state: any): System.Threading.CancellationTokenRegistration;
-		Register(callback: any, state: any, useSynchronizationContext: boolean): System.Threading.CancellationTokenRegistration;
-		UnsafeRegister(callback: any, state: any): System.Threading.CancellationTokenRegistration;
-		Equals(other: System.Threading.CancellationToken): boolean;
-		Equals(other: any): boolean;
-		GetHashCode(): number;
-		static op_Equality(left: System.Threading.CancellationToken, right: System.Threading.CancellationToken): boolean;
-		static op_Inequality(left: System.Threading.CancellationToken, right: System.Threading.CancellationToken): boolean;
-		ThrowIfCancellationRequested(): void;
-		ToString(): string;
-		GetType(): System.Type;
-	}
-	class CancellationTokenRegistration extends System.ValueType {
-		Token: System.Threading.CancellationToken;
-		Dispose(): void;
-		DisposeAsync(): System.Threading.Tasks.ValueTask;
-		Unregister(): boolean;
-		static op_Equality(left: System.Threading.CancellationTokenRegistration, right: System.Threading.CancellationTokenRegistration): boolean;
-		static op_Inequality(left: System.Threading.CancellationTokenRegistration, right: System.Threading.CancellationTokenRegistration): boolean;
-		Equals(obj: any): boolean;
-		Equals(other: System.Threading.CancellationTokenRegistration): boolean;
-		GetHashCode(): number;
-		ToString(): string;
-		GetType(): System.Type;
-	}
-	abstract class WaitHandle extends System.MarshalByRefObject {
-		Handle: System.IntPtr;
-		SafeWaitHandle: Microsoft.Win32.SafeHandles.SafeWaitHandle;
-		Close(): void;
-		Dispose(): void;
-		WaitOne(millisecondsTimeout: number): boolean;
-		WaitOne(timeout: System.TimeSpan): boolean;
-		WaitOne(): boolean;
-		WaitOne(millisecondsTimeout: number, exitContext: boolean): boolean;
-		WaitOne(timeout: System.TimeSpan, exitContext: boolean): boolean;
-		static WaitAll(waitHandles: any, millisecondsTimeout: number): boolean;
-		static WaitAll(waitHandles: any, timeout: System.TimeSpan): boolean;
-		static WaitAll(waitHandles: any): boolean;
-		static WaitAll(waitHandles: any, millisecondsTimeout: number, exitContext: boolean): boolean;
-		static WaitAll(waitHandles: any, timeout: System.TimeSpan, exitContext: boolean): boolean;
-		static WaitAny(waitHandles: any, millisecondsTimeout: number): number;
-		static WaitAny(waitHandles: any, timeout: System.TimeSpan): number;
-		static WaitAny(waitHandles: any): number;
-		static WaitAny(waitHandles: any, millisecondsTimeout: number, exitContext: boolean): number;
-		static WaitAny(waitHandles: any, timeout: System.TimeSpan, exitContext: boolean): number;
-		static SignalAndWait(toSignal: System.Threading.WaitHandle, toWaitOn: System.Threading.WaitHandle): boolean;
-		static SignalAndWait(toSignal: System.Threading.WaitHandle, toWaitOn: System.Threading.WaitHandle, timeout: System.TimeSpan, exitContext: boolean): boolean;
-		static SignalAndWait(toSignal: System.Threading.WaitHandle, toWaitOn: System.Threading.WaitHandle, millisecondsTimeout: number, exitContext: boolean): boolean;
-		GetLifetimeService(): any;
-		InitializeLifetimeService(): any;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-}
-declare module Microsoft.Win32.SafeHandles {
-	class SafeFileHandle extends Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid {
-		constructor(preexistingHandle: System.IntPtr, ownsHandle: boolean);
-		DangerousGetHandle(): System.IntPtr;
-		Close(): void;
-		Dispose(): void;
-		SetHandleAsInvalid(): void;
-		DangerousAddRef(success: any): void;
-		DangerousRelease(): void;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-	abstract class SafeHandleZeroOrMinusOneIsInvalid extends System.Runtime.InteropServices.SafeHandle {
-		IsInvalid: boolean;
-		DangerousGetHandle(): System.IntPtr;
-		Close(): void;
-		Dispose(): void;
-		SetHandleAsInvalid(): void;
-		DangerousAddRef(success: any): void;
-		DangerousRelease(): void;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-	class SafeWaitHandle extends Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid {
-		constructor(existingHandle: System.IntPtr, ownsHandle: boolean);
-		DangerousGetHandle(): System.IntPtr;
-		Close(): void;
-		Dispose(): void;
-		SetHandleAsInvalid(): void;
-		DangerousAddRef(success: any): void;
-		DangerousRelease(): void;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-}
-declare module System.Runtime.InteropServices {
-	enum LayoutKind {
-		Sequential = 0,
-		Explicit = 2,
-		Auto = 3,
-	}
-	abstract class SafeHandle extends System.Runtime.ConstrainedExecution.CriticalFinalizerObject {
-		IsClosed: boolean;
-		IsInvalid: boolean;
-		DangerousGetHandle(): System.IntPtr;
-		Close(): void;
-		Dispose(): void;
-		SetHandleAsInvalid(): void;
-		DangerousAddRef(success: any): void;
-		DangerousRelease(): void;
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-	class StructLayoutAttribute extends System.Attribute {
-			Pack: number;
-			Size: number;
-			CharSet: any;
-		Value: System.Runtime.InteropServices.LayoutKind;
-		constructor(layoutKind: System.Runtime.InteropServices.LayoutKind);
-		constructor(layoutKind: number);
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-		Match(obj: any): boolean;
-		IsDefaultAttribute(): boolean;
-		GetType(): System.Type;
-		ToString(): string;
-	}
-}
-declare module System.Runtime.ConstrainedExecution {
-	abstract class CriticalFinalizerObject {
-		GetType(): System.Type;
-		ToString(): string;
-		Equals(obj: any): boolean;
-		GetHashCode(): number;
-	}
-}
 declare module System.Runtime.CompilerServices {
 	class ConfiguredTaskAwaitable extends System.ValueType {
 		GetAwaiter(): any;
@@ -4812,6 +4487,332 @@ declare module System.Security {
 		None = 0,
 		Level1 = 1,
 		Level2 = 2,
+	}
+}
+declare module System.Text {
+	abstract class Decoder {
+		Fallback: System.Text.DecoderFallback;
+		FallbackBuffer: System.Text.DecoderFallbackBuffer;
+		Reset(): void;
+		GetCharCount(bytes: any, index: number, count: number): number;
+		GetCharCount(bytes: any, index: number, count: number, flush: boolean): number;
+		GetCharCount(bytes: any, count: number, flush: boolean): number;
+		GetCharCount(bytes: any, flush: boolean): number;
+		GetChars(bytes: any, byteIndex: number, byteCount: number, chars: number[], charIndex: number): number;
+		GetChars(bytes: any, byteIndex: number, byteCount: number, chars: number[], charIndex: number, flush: boolean): number;
+		GetChars(bytes: any, byteCount: number, chars: any, charCount: number, flush: boolean): number;
+		GetChars(bytes: any, chars: any, flush: boolean): number;
+		Convert(bytes: any, byteIndex: number, byteCount: number, chars: number[], charIndex: number, charCount: number, flush: boolean, bytesUsed: any, charsUsed: any, completed: any): void;
+		Convert(bytes: any, byteCount: number, chars: any, charCount: number, flush: boolean, bytesUsed: any, charsUsed: any, completed: any): void;
+		Convert(bytes: any, chars: any, flush: boolean, bytesUsed: any, charsUsed: any, completed: any): void;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+	abstract class DecoderFallback {
+		MaxCharCount: number;
+		CreateFallbackBuffer(): System.Text.DecoderFallbackBuffer;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+	abstract class DecoderFallbackBuffer {
+		Remaining: number;
+		Fallback(bytesUnknown: any, index: number): boolean;
+		GetNextChar(): number;
+		MovePrevious(): boolean;
+		Reset(): void;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+	abstract class Encoder {
+		Fallback: System.Text.EncoderFallback;
+		FallbackBuffer: System.Text.EncoderFallbackBuffer;
+		Reset(): void;
+		GetByteCount(chars: number[], index: number, count: number, flush: boolean): number;
+		GetByteCount(chars: any, count: number, flush: boolean): number;
+		GetByteCount(chars: any, flush: boolean): number;
+		GetBytes(chars: number[], charIndex: number, charCount: number, bytes: any, byteIndex: number, flush: boolean): number;
+		GetBytes(chars: any, charCount: number, bytes: any, byteCount: number, flush: boolean): number;
+		GetBytes(chars: any, bytes: any, flush: boolean): number;
+		Convert(chars: number[], charIndex: number, charCount: number, bytes: any, byteIndex: number, byteCount: number, flush: boolean, charsUsed: any, bytesUsed: any, completed: any): void;
+		Convert(chars: any, charCount: number, bytes: any, byteCount: number, flush: boolean, charsUsed: any, bytesUsed: any, completed: any): void;
+		Convert(chars: any, bytes: any, flush: boolean, charsUsed: any, bytesUsed: any, completed: any): void;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+	abstract class EncoderFallback {
+		MaxCharCount: number;
+		CreateFallbackBuffer(): System.Text.EncoderFallbackBuffer;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+	abstract class EncoderFallbackBuffer {
+		Remaining: number;
+		Fallback(charUnknown: number, index: number): boolean;
+		Fallback(charUnknownHigh: number, charUnknownLow: number, index: number): boolean;
+		GetNextChar(): number;
+		MovePrevious(): boolean;
+		Reset(): void;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+	abstract class Encoding {
+		Preamble: any;
+		BodyName: string;
+		EncodingName: string;
+		HeaderName: string;
+		WebName: string;
+		WindowsCodePage: number;
+		IsBrowserDisplay: boolean;
+		IsBrowserSave: boolean;
+		IsMailNewsDisplay: boolean;
+		IsMailNewsSave: boolean;
+		IsSingleByte: boolean;
+		EncoderFallback: System.Text.EncoderFallback;
+		DecoderFallback: System.Text.DecoderFallback;
+		IsReadOnly: boolean;
+		CodePage: number;
+		static Convert(srcEncoding: System.Text.Encoding, dstEncoding: System.Text.Encoding, bytes: any): any;
+		static Convert(srcEncoding: System.Text.Encoding, dstEncoding: System.Text.Encoding, bytes: any, index: number, count: number): any;
+		static RegisterProvider(provider: System.Text.EncodingProvider): void;
+		static GetEncoding(codepage: number): System.Text.Encoding;
+		static GetEncoding(codepage: number, encoderFallback: System.Text.EncoderFallback, decoderFallback: System.Text.DecoderFallback): System.Text.Encoding;
+		static GetEncoding(name: string): System.Text.Encoding;
+		static GetEncoding(name: string, encoderFallback: System.Text.EncoderFallback, decoderFallback: System.Text.DecoderFallback): System.Text.Encoding;
+		static GetEncodings(): any;
+		GetPreamble(): any;
+		Clone(): any;
+		GetByteCount(chars: number[]): number;
+		GetByteCount(s: string): number;
+		GetByteCount(chars: number[], index: number, count: number): number;
+		GetByteCount(s: string, index: number, count: number): number;
+		GetByteCount(chars: any, count: number): number;
+		GetByteCount(chars: any): number;
+		GetBytes(chars: number[]): any;
+		GetBytes(chars: number[], index: number, count: number): any;
+		GetBytes(chars: number[], charIndex: number, charCount: number, bytes: any, byteIndex: number): number;
+		GetBytes(s: string): any;
+		GetBytes(s: string, index: number, count: number): any;
+		GetBytes(s: string, charIndex: number, charCount: number, bytes: any, byteIndex: number): number;
+		GetBytes(chars: any, charCount: number, bytes: any, byteCount: number): number;
+		GetBytes(chars: any, bytes: any): number;
+		GetCharCount(bytes: any): number;
+		GetCharCount(bytes: any, index: number, count: number): number;
+		GetCharCount(bytes: any, count: number): number;
+		GetCharCount(bytes: any): number;
+		GetChars(bytes: any): number[];
+		GetChars(bytes: any, index: number, count: number): number[];
+		GetChars(bytes: any, byteIndex: number, byteCount: number, chars: number[], charIndex: number): number;
+		GetChars(bytes: any, byteCount: number, chars: any, charCount: number): number;
+		GetChars(bytes: any, chars: any): number;
+		GetString(bytes: any, byteCount: number): string;
+		GetString(bytes: any): string;
+		IsAlwaysNormalized(): boolean;
+		IsAlwaysNormalized(form: System.Text.NormalizationForm): boolean;
+		GetDecoder(): System.Text.Decoder;
+		GetEncoder(): System.Text.Encoder;
+		GetMaxByteCount(charCount: number): number;
+		GetMaxCharCount(byteCount: number): number;
+		GetString(bytes: any): string;
+		GetString(bytes: any, index: number, count: number): string;
+		Equals(value: any): boolean;
+		GetHashCode(): number;
+		static CreateTranscodingStream(innerStream: System.IO.Stream, innerStreamEncoding: System.Text.Encoding, outerStreamEncoding: System.Text.Encoding, leaveOpen?: boolean): System.IO.Stream;
+		GetType(): System.Type;
+		ToString(): string;
+	}
+	abstract class EncodingProvider {
+		constructor();
+		GetEncoding(name: string): System.Text.Encoding;
+		GetEncoding(codepage: number): System.Text.Encoding;
+		GetEncoding(name: string, encoderFallback: System.Text.EncoderFallback, decoderFallback: System.Text.DecoderFallback): System.Text.Encoding;
+		GetEncoding(codepage: number, encoderFallback: System.Text.EncoderFallback, decoderFallback: System.Text.DecoderFallback): System.Text.Encoding;
+		GetType(): System.Type;
+		ToString(): string;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+	enum NormalizationForm {
+		FormC = 1,
+		FormD = 2,
+		FormKC = 5,
+		FormKD = 6,
+	}
+	class Rune extends System.ValueType {
+		IsAscii: boolean;
+		IsBmp: boolean;
+		Plane: number;
+		Utf16SequenceLength: number;
+		Utf8SequenceLength: number;
+		Value: number;
+		constructor(ch: number);
+		constructor(highSurrogate: number, lowSurrogate: number);
+		constructor(value: number);
+		constructor(value: System.UInt32);
+		static op_Equality(left: System.Text.Rune, right: System.Text.Rune): boolean;
+		static op_Inequality(left: System.Text.Rune, right: System.Text.Rune): boolean;
+		static op_LessThan(left: System.Text.Rune, right: System.Text.Rune): boolean;
+		static op_LessThanOrEqual(left: System.Text.Rune, right: System.Text.Rune): boolean;
+		static op_GreaterThan(left: System.Text.Rune, right: System.Text.Rune): boolean;
+		static op_GreaterThanOrEqual(left: System.Text.Rune, right: System.Text.Rune): boolean;
+		static op_Explicit(ch: number): System.Text.Rune;
+		static op_Explicit(value: System.UInt32): System.Text.Rune;
+		static op_Explicit(value: number): System.Text.Rune;
+		CompareTo(other: System.Text.Rune): number;
+		static DecodeFromUtf16(source: any, result: any, charsConsumed: any): System.Buffers.OperationStatus;
+		static DecodeFromUtf8(source: any, result: any, bytesConsumed: any): System.Buffers.OperationStatus;
+		static DecodeLastFromUtf16(source: any, result: any, charsConsumed: any): System.Buffers.OperationStatus;
+		static DecodeLastFromUtf8(source: any, value: any, bytesConsumed: any): System.Buffers.OperationStatus;
+		EncodeToUtf16(destination: any): number;
+		EncodeToUtf8(destination: any): number;
+		Equals(obj: any): boolean;
+		Equals(other: System.Text.Rune): boolean;
+		GetHashCode(): number;
+		static GetRuneAt(input: string, index: number): System.Text.Rune;
+		static IsValid(value: number): boolean;
+		static IsValid(value: System.UInt32): boolean;
+		ToString(): string;
+		static TryCreate(ch: number, result: any): boolean;
+		static TryCreate(highSurrogate: number, lowSurrogate: number, result: any): boolean;
+		static TryCreate(value: number, result: any): boolean;
+		static TryCreate(value: System.UInt32, result: any): boolean;
+		TryEncodeToUtf16(destination: any, charsWritten: any): boolean;
+		TryEncodeToUtf8(destination: any, bytesWritten: any): boolean;
+		static TryGetRuneAt(input: string, index: number, value: any): boolean;
+		static GetNumericValue(value: System.Text.Rune): System.Double;
+		static GetUnicodeCategory(value: System.Text.Rune): System.Globalization.UnicodeCategory;
+		static IsControl(value: System.Text.Rune): boolean;
+		static IsDigit(value: System.Text.Rune): boolean;
+		static IsLetter(value: System.Text.Rune): boolean;
+		static IsLetterOrDigit(value: System.Text.Rune): boolean;
+		static IsLower(value: System.Text.Rune): boolean;
+		static IsNumber(value: System.Text.Rune): boolean;
+		static IsPunctuation(value: System.Text.Rune): boolean;
+		static IsSeparator(value: System.Text.Rune): boolean;
+		static IsSymbol(value: System.Text.Rune): boolean;
+		static IsUpper(value: System.Text.Rune): boolean;
+		static IsWhiteSpace(value: System.Text.Rune): boolean;
+		static ToLower(value: System.Text.Rune, culture: System.Globalization.CultureInfo): System.Text.Rune;
+		static ToLowerInvariant(value: System.Text.Rune): System.Text.Rune;
+		static ToUpper(value: System.Text.Rune, culture: System.Globalization.CultureInfo): System.Text.Rune;
+		static ToUpperInvariant(value: System.Text.Rune): System.Text.Rune;
+		GetType(): System.Type;
+	}
+	class StringBuilder {
+		Capacity: number;
+		MaxCapacity: number;
+		Length: number;
+		Chars: number;
+		constructor();
+		constructor(capacity: number);
+		constructor(value: string);
+		constructor(value: string, capacity: number);
+		constructor(value: string, startIndex: number, length: number, capacity: number);
+		constructor(capacity: number, maxCapacity: number);
+		Insert(index: number, value: System.UInt32): System.Text.StringBuilder;
+		Insert(index: number, value: System.UInt64): System.Text.StringBuilder;
+		Insert(index: number, value: any): System.Text.StringBuilder;
+		Insert(index: number, value: any): System.Text.StringBuilder;
+		AppendFormat(format: string, arg0: any): System.Text.StringBuilder;
+		AppendFormat(format: string, arg0: any, arg1: any): System.Text.StringBuilder;
+		AppendFormat(format: string, arg0: any, arg1: any, arg2: any): System.Text.StringBuilder;
+		AppendFormat(format: string, ...args: any): System.Text.StringBuilder;
+		AppendFormat(provider: System.IFormatProvider, format: string, arg0: any): System.Text.StringBuilder;
+		AppendFormat(provider: System.IFormatProvider, format: string, arg0: any, arg1: any): System.Text.StringBuilder;
+		AppendFormat(provider: System.IFormatProvider, format: string, arg0: any, arg1: any, arg2: any): System.Text.StringBuilder;
+		AppendFormat(provider: System.IFormatProvider, format: string, ...args: any): System.Text.StringBuilder;
+		Replace(oldValue: string, newValue: string): System.Text.StringBuilder;
+		Equals(sb: System.Text.StringBuilder): boolean;
+		Equals(span: any): boolean;
+		Replace(oldValue: string, newValue: string, startIndex: number, count: number): System.Text.StringBuilder;
+		Replace(oldChar: number, newChar: number): System.Text.StringBuilder;
+		Replace(oldChar: number, newChar: number, startIndex: number, count: number): System.Text.StringBuilder;
+		Append(value: any, valueCount: number): System.Text.StringBuilder;
+		EnsureCapacity(capacity: number): number;
+		ToString(): string;
+		ToString(startIndex: number, length: number): string;
+		Clear(): System.Text.StringBuilder;
+		GetChunks(): any;
+		Append(value: number, repeatCount: number): System.Text.StringBuilder;
+		Append(value: number[], startIndex: number, charCount: number): System.Text.StringBuilder;
+		Append(value: string): System.Text.StringBuilder;
+		Append(value: string, startIndex: number, count: number): System.Text.StringBuilder;
+		Append(value: System.Text.StringBuilder): System.Text.StringBuilder;
+		Append(value: System.Text.StringBuilder, startIndex: number, count: number): System.Text.StringBuilder;
+		AppendLine(): System.Text.StringBuilder;
+		AppendLine(value: string): System.Text.StringBuilder;
+		CopyTo(sourceIndex: number, destination: number[], destinationIndex: number, count: number): void;
+		CopyTo(sourceIndex: number, destination: any, count: number): void;
+		Insert(index: number, value: string, count: number): System.Text.StringBuilder;
+		Remove(startIndex: number, length: number): System.Text.StringBuilder;
+		Append(value: boolean): System.Text.StringBuilder;
+		Append(value: number): System.Text.StringBuilder;
+		Append(value: System.SByte): System.Text.StringBuilder;
+		Append(value: System.Byte): System.Text.StringBuilder;
+		Append(value: number): System.Text.StringBuilder;
+		Append(value: number): System.Text.StringBuilder;
+		Append(value: number): System.Text.StringBuilder;
+		Append(value: number): System.Text.StringBuilder;
+		Append(value: System.Double): System.Text.StringBuilder;
+		Append(value: number): System.Text.StringBuilder;
+		Append(value: System.UInt16): System.Text.StringBuilder;
+		Append(value: System.UInt32): System.Text.StringBuilder;
+		Append(value: System.UInt64): System.Text.StringBuilder;
+		Append(value: any): System.Text.StringBuilder;
+		Append(value: number[]): System.Text.StringBuilder;
+		Append(value: any): System.Text.StringBuilder;
+		Append(value: any): System.Text.StringBuilder;
+		AppendJoin(separator: string, ...values: any): System.Text.StringBuilder;
+		AppendJoin(separator: string, values: any): System.Text.StringBuilder;
+		AppendJoin(separator: string, ...values: string[]): System.Text.StringBuilder;
+		AppendJoin(separator: number, ...values: any): System.Text.StringBuilder;
+		AppendJoin(separator: number, values: any): System.Text.StringBuilder;
+		AppendJoin(separator: number, ...values: string[]): System.Text.StringBuilder;
+		Insert(index: number, value: string): System.Text.StringBuilder;
+		Insert(index: number, value: boolean): System.Text.StringBuilder;
+		Insert(index: number, value: System.SByte): System.Text.StringBuilder;
+		Insert(index: number, value: System.Byte): System.Text.StringBuilder;
+		Insert(index: number, value: number): System.Text.StringBuilder;
+		Insert(index: number, value: number): System.Text.StringBuilder;
+		Insert(index: number, value: number[]): System.Text.StringBuilder;
+		Insert(index: number, value: number[], startIndex: number, charCount: number): System.Text.StringBuilder;
+		Insert(index: number, value: number): System.Text.StringBuilder;
+		Insert(index: number, value: number): System.Text.StringBuilder;
+		Insert(index: number, value: number): System.Text.StringBuilder;
+		Insert(index: number, value: System.Double): System.Text.StringBuilder;
+		Insert(index: number, value: number): System.Text.StringBuilder;
+		Insert(index: number, value: System.UInt16): System.Text.StringBuilder;
+		GetType(): System.Type;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+	}
+	class StringRuneEnumerator extends System.ValueType {
+		Current: System.Text.Rune;
+		GetEnumerator(): System.Text.StringRuneEnumerator;
+		MoveNext(): boolean;
+		Equals(obj: any): boolean;
+		GetHashCode(): number;
+		ToString(): string;
+		GetType(): System.Type;
+	}
+}
+declare module System.Buffers {
+	enum OperationStatus {
+		Done = 0,
+		DestinationTooSmall = 1,
+		NeedMoreData = 2,
+		InvalidData = 3,
 	}
 }
 declare module Mono.Cecil {
